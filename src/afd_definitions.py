@@ -1,0 +1,34 @@
+import re
+
+token_regex = {
+    "TIPO": r"\binteiro\b",
+    "SE": r"\bse\b",
+    "ENTAO": r"\bentão\b",
+    "SENAO": r"\bsenão\b",
+    "FIMSE": r"\bfim_se\b",
+    "PARA": r"\bpara\b",
+    "ATE": r"\baté\b",
+    "PASSO": r"\bpasso\b",
+    "FIMPARA": r"\bfim_para\b",
+    "LEIA": r"\bleia\b",
+    "ESCREVA": r"\bescreva\b",
+    "ATR": r"<-",
+    "LOGIGUAL": r"=",
+    "LOGDIFF": r"<>",
+    "LOGMAIORIGUAL": r">=",
+    "LOGMENORIGUAL": r"<=",
+    "LOGMAIOR": r">",
+    "LOGMENOR": r"<",
+    "E": r"\be\b",
+    "OU": r"\bou\b",
+    "NAO": r"\bnão\b",
+    "OPMAIS": r"\+",
+    "OPMENOS": r"-",
+    "OPMULTI": r"\*",
+    "OPDIVI": r"/",
+    "PARAB": r"\(",
+    "PARFE": r"\)",
+    "NUMINT": r"\b\d+\b",
+    "STRING": r'"[^"\n]*"',  # String literal entre aspas
+    "ID": r"\b[a-zA-Z_][a-zA-Z0-9_]*\b"
+}

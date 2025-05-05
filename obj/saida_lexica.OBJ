@@ -1,0 +1,24 @@
+30 inteiro
+8 0
+30 inteiro
+8 1
+9 leia
+24 (
+8 0
+25 )
+27 se
+8 0
+13 >=
+17 18
+4 então
+5 escreva
+24 (
+29 "Maior de idade"
+25 )
+28 senão
+5 escreva
+24 (
+29 "Menor de idade"
+25 )
+7 fim_se
+31 EOF
