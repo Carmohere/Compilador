@@ -29,5 +29,7 @@ TOKENS = {
     "SENAO": 28,
     "STRING": 29,
     "TIPO": 30,
-    "EOF": 31
+    "EOF": 31,
+    "DOIS_PONTOS": 32,
+    "PONTO_VIRGULA": 33
 }

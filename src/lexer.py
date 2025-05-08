@@ -9,9 +9,10 @@ TABELA_SIMBOLOS = {}
 SIMBOLO_POS = 0
 
 def eh_palavra_reservada(lexema):
-    for token in ["TIPO", "SE", "ENTAO", "SENAO", "FIMSE", "PARA", "ATE", "PASSO", "FIMPARA", "LEIA", "ESCREVA", "E", "OU", "NAO"]:
-        if re.fullmatch(token_regex[token], lexema):
-            return token
+    for token, pattern in token_regex.items():
+        if token in ["TIPO", "SE", "ENTAO", "SENAO", "FIMSE", "PARA", "ATE", "PASSO", "FIMPARA", "LEIA", "ESCREVA", "E", "OU", "NAO"]:  # lista de palavras reservadas
+            if re.fullmatch(pattern, lexema):
+                return token
     return None
 
 def adicionar_simbolo(lexema):
@@ -45,11 +46,12 @@ def analisar_lexico(caminho_entrada, caminho_saida):
                     reservado = eh_palavra_reservada(lexema)
                     if reservado:
                         token = reservado
+                        tokens_encontrados.append((TOKENS[token], lexema))
                     else:
                         pos_simbolo = adicionar_simbolo(lexema)
                         tokens_encontrados.append((TOKENS["ID"], pos_simbolo))
-                        pos += len(lexema)
-                        break
+                    pos += len(lexema)
+                    continue
 
                 elif token == "STRING" or token == "NUMINT":
                     tokens_encontrados.append((TOKENS[token], lexema))
@@ -60,21 +62,26 @@ def analisar_lexico(caminho_entrada, caminho_saida):
                     pos += len(lexema)
                     break
 
-        if not match and not m:
-            print(f"[ERRO] Lexema não reconhecido próximo de: {codigo[pos:pos+10]}")
-            pos += 1  # ignora caractere inválido (pode-se abortar o programa se preferir)
+        if not m:
+            linha = codigo.count('\n', 0, pos) + 1
+            coluna = pos - codigo.rfind('\n', 0, pos)
+            print(f"[ERRO Léxico] Linha {linha}, Coluna {coluna}: Caractere inesperado '{codigo[pos]}'")
+            pos += 1
+            continue
 
     # Token final de arquivo
     tokens_encontrados.append((TOKENS["EOF"], "EOF"))
 
     # Escrever arquivo de saída (.OBJ)
+    # Em analisar_lexico(), ao escrever o arquivo:
     with open(caminho_saida, "w", encoding="utf-8") as f:
-        for codigo, valor in tokens_encontrados:
-            f.write(f"{codigo} {valor}\n")
+        for codigo_token, valor in tokens_encontrados:
+            nome_token = [k for k, v in TOKENS.items() if v == codigo_token][0]
+            f.write(f"{nome_token}({codigo_token}): {valor}\n")
 
     # Escrever tabela de símbolos
     with open("obj/tabela_simbolos.json", "w", encoding="utf-8") as f:
         json.dump(TABELA_SIMBOLOS, f, indent=4, ensure_ascii=False)
 
-    print("[✔] Análise léxica concluída com sucesso.")
+    print("Análise léxica concluída com sucesso.")
 

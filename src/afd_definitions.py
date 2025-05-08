@@ -1,6 +1,8 @@
 import re
 
 token_regex = {
+    "DOIS_PONTOS": r":",
+    "PONTO_VIRGULA": r";",
     "TIPO": r"\binteiro\b",
     "SE": r"\bse\b",
     "ENTAO": r"\bentão\b",
@@ -28,7 +30,7 @@ token_regex = {
     "OPDIVI": r"/",
     "PARAB": r"\(",
     "PARFE": r"\)",
-    "NUMINT": r"\b\d+\b",
-    "STRING": r'"[^"\n]*"',  # String literal entre aspas
+    "NUMINT": r"\b(0|[1-9]\d*)\b",
+    "STRING": r'"(?:\\.|[^"\\])*"',
     "ID": r"\b[a-zA-Z_][a-zA-Z0-9_]*\b"
 }
