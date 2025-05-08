@@ -84,4 +84,3 @@ def analisar_lexico(caminho_entrada, caminho_saida):
         json.dump(TABELA_SIMBOLOS, f, indent=4, ensure_ascii=False)
 
     print("Análise léxica concluída com sucesso.")
-
