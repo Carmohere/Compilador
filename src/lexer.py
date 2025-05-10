@@ -76,8 +76,7 @@ def analisar_lexico(caminho_entrada, caminho_saida):
     # Em analisar_lexico(), ao escrever o arquivo:
     with open(caminho_saida, "w", encoding="utf-8") as f:
         for codigo_token, valor in tokens_encontrados:
-            nome_token = [k for k, v in TOKENS.items() if v == codigo_token][0]
-            f.write(f"{nome_token}({codigo_token}): {valor}\n")
+            f.write(f"{codigo_token} {valor}\n")
 
     # Escrever tabela de símbolos
     with open("obj/tabela_simbolos.json", "w", encoding="utf-8") as f:
