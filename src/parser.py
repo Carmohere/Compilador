@@ -33,6 +33,19 @@ class Parser:
                 self.cmd_escreva()
             elif tipo == 'LEIA':
                 self.cmd_leia()
+
+            elif tipo == 'TIPO':
+                self.cmd_declaracao()
+
+            elif tipo == 'ID':
+                self.cmd_atribuicao()
+
+            elif tipo == 'SE':
+                self.cmd_se()
+
+            elif tipo == 'PARA':
+                self.cmd_para()
+
             elif tipo == 'EOF':
                 break
             else:
@@ -84,3 +97,96 @@ class Parser:
             return self.erro("Esperado ';' após 'leia'", token)
 
         print("Comando 'leia' reconhecido com sucesso.")
+
+    def cmd_declaracao(self):
+        print("Reconhecendo declaração de variável")
+        self.proximo_token()  # consome TIPO
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "DOIS_PONTOS":
+            return self.erro("Esperado ':' após tipo na declaração", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "ID":
+            return self.erro("Esperado identificador (ID) na declaração", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
+            return self.erro("Esperado ';' ao final da declaração", token)
+
+        print("Declaração de variável reconhecida com sucesso.")
+
+    def cmd_atribuicao(self):
+        print("Reconhecendo comando de atribuição")
+        token = self.proximo_token()  # consome ID
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "ATR":
+            return self.erro("Esperado operador de atribuição '<-'", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) not in ("NUMINT", "ID", "STRING"):
+            return self.erro("Esperado valor NUMINT, ID ou STRING na atribuição", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
+            return self.erro("Esperado ';' após a atribuição", token)
+
+        print("Comando de atribuição reconhecido com sucesso.")
+
+    def cmd_se(self):
+        print("Reconhecendo comando 'se'")
+        self.proximo_token()  # consome 'SE'
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PARAB":
+            return self.erro("Esperado '(' após 'se'", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) not in ("ID", "NUMINT"):
+            return self.erro("Esperado ID ou número na condição", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) not in ("LOGMENOR", "LOGMAIOR", "LOGIGUAL", "LOGDIFF", "LOGMENORIGUAL",
+                                           "LOGMAIORIGUAL"):
+            return self.erro("Esperado operador lógico na condição", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) not in ("ID", "NUMINT"):
+            return self.erro("Esperado ID ou número após operador lógico", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PARFE":
+            return self.erro("Esperado ')' após condição", token)
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "ENTAO":
+            return self.erro("Esperado 'entao' após condição", token)
+
+        # Reconhece comandos dentro do bloco
+        while True:
+            token = self.token_atual()
+            tipo = TOKEN_MAP.get(token[0])
+
+            if tipo == "ESCREVA":
+                self.cmd_escreva()
+            elif tipo == "LEIA":
+                self.cmd_leia()
+            elif tipo == "ID":
+                self.cmd_atribuicao()
+            elif tipo == "FIMSE":
+                break
+            else:
+                return self.erro("Comando inválido dentro de 'se'", token)
+
+        self.proximo_token()  # consome 'FIMSE'
+
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
+            return self.erro("Esperado ';' após 'fimse'", token)
+
+        print("Comando 'se' reconhecido com sucesso.")
+
+
+
+

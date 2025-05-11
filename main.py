@@ -14,3 +14,6 @@ with open("obj/saida_lexica.obj", "r", encoding="utf-8") as f:
 
 parser = Parser(tokens)
 parser.analisar()
+print("Tokens reconhecidos:")
+for t in tokens:
+    print(t)
