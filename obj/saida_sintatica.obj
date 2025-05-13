@@ -1,0 +1,16 @@
+PROGRAMA
+  DECLARACAO
+    TIPO: inteiro
+    ID: 0
+  DECLARACAO
+    TIPO: inteiro
+    ID: 1
+  ATRIBUICAO
+    ID: 0
+    VALOR: 2
+  ATRIBUICAO
+    ID: 1
+    VALOR: 0
+  LEIA: 0
+  ESCREVA
+    VALOR: 1
