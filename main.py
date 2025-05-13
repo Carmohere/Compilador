@@ -13,7 +13,17 @@ with open("obj/saida_lexica.obj", "r", encoding="utf-8") as f:
     tokens = [tuple(linha.strip().split()) for linha in linhas]
 
 parser = Parser(tokens)
-parser.analisar()
+ast = parser.analisar()
 print("Tokens reconhecidos:")
 for t in tokens:
     print(t)
+
+def salvar_ast_em_arquivo(ast, caminho_arquivo):
+    # Verifica se a pasta 'obj' existe, caso contrário, cria
+    os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+
+    with open(caminho_arquivo, "w", encoding="utf-8") as f:
+        f.write(str(ast))
+
+salvar_ast_em_arquivo(ast, 'obj/saida_sintatica.obj')
+print("Arquivo AST gerado em 'obj/saida_sintatica.obj'")
