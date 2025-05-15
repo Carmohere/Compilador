@@ -17,9 +17,6 @@ class ASTNode:
             resultado += filho.__repr__(nivel + 1)
         return resultado
 
-
-
-
 class Programa(ASTNode):
     def __init__(self, comandos):
         self.comandos = comandos

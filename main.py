@@ -2,7 +2,9 @@ import sys
 import os
 from src.parser import Parser
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
-from lexer import analisar_lexico
+from src.lexer import analisar_lexico
+from src.semantico import AnalisadorSemantico
+
 
 if __name__ == "__main__":
     analisar_lexico("entrada/exemplo.POR", "obj/saida_lexica.OBJ")
@@ -27,3 +29,6 @@ def salvar_ast_em_arquivo(ast, caminho_arquivo):
 salvar_ast_em_arquivo(ast, 'obj/saida_sintatica.obj')
 print("Arquivo AST gerado em 'obj/saida_sintatica.obj'")
 
+# Análise semântica
+analisador = AnalisadorSemantico(ast)
+analisador.analisar()
