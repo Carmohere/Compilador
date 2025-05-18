@@ -69,10 +69,6 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "PARFE":
             self.erro("Esperado ')' após valor em 'escreva'", token)
 
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
-            self.erro("Esperado ';' após 'escreva'", token)
-
         print("Comando 'escreva' reconhecido com sucesso.")
 
         return ASTNode("ESCREVA", filhos=[
@@ -94,10 +90,6 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "PARFE":
             self.erro("Esperado ')' após ID em 'leia'", token)
 
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
-            self.erro("Esperado ';' após 'leia'", token)
-
         return ASTNode("LEIA", valor=id_token[1])
 
     def cmd_declaracao(self):
@@ -105,17 +97,9 @@ class Parser:
         tipo_token = self.proximo_token()  # consome TIPO
         tipo_nome = tipo_token[1]
 
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "DOIS_PONTOS":
-            return self.erro("Esperado ':' após tipo na declaração", token)
-
         id_token = self.proximo_token()
         if TOKEN_MAP.get(id_token[0]) != "ID":
             return self.erro("Esperado identificador (ID) na declaração", id_token)
-
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
-            return self.erro("Esperado ';' ao final da declaração", token)
 
         print("Declaração de variável reconhecida com sucesso.")
         return ASTNode("DECLARACAO", filhos=[
@@ -137,10 +121,6 @@ class Parser:
         valor_token = self.proximo_token()
         if TOKEN_MAP.get(valor_token[0]) not in ("ID", "NUMINT", "STRING"):
             self.erro("Esperado valor numérico, identificador ou string na atribuição", valor_token)
-
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
-            self.erro("Esperado ';' após valor na atribuição", token)
 
         print("Comando de atribuição reconhecido com sucesso.")
 
@@ -228,10 +208,6 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "FIMSE":
             self.erro("Esperado 'fimse'", token)
         self.proximo_token()
-
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PONTO_VIRGULA":
-            self.erro("Esperado ';' após 'fimse'", token)
 
         print("Comando 'se' reconhecido com sucesso.")
         return ASTNode("SE", filhos=[

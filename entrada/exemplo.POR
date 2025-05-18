@@ -1,5 +1,4 @@
-inteiro : a;
-inteiro : b;
-a <- 2;
-b <- a;
-escreva(b);
+  inteiro x
+  x <- 5
+  leia (x)
+  escreva (x)
