@@ -7,7 +7,7 @@ from src.semantico import AnalisadorSemantico
 
 
 if __name__ == "__main__":
-    analisar_lexico("entrada/exemplo.POR", "obj/saida_lexica.OBJ")
+    analisar_lexico("entrada/exemplo.POR", "obj/saida_lexica.obj")
 
 with open("obj/saida_lexica.obj", "r", encoding="utf-8") as f:
     linhas = f.readlines()

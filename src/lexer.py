@@ -45,13 +45,15 @@ def analisar_lexico(caminho_entrada, caminho_saida):
                 if token == "ID":
                     reservado = eh_palavra_reservada(lexema)
                     if reservado:
-                        token = reservado
-                        tokens_encontrados.append((TOKENS[token], lexema))
+                        tokens_encontrados.append((TOKENS[reservado], lexema))
                     else:
-                        pos_simbolo = adicionar_simbolo(lexema)
-                        tokens_encontrados.append((TOKENS["ID"], pos_simbolo))
+                        adicionar_simbolo(lexema)
+                        tokens_encontrados.append((TOKENS["ID"], lexema))
                     pos += len(lexema)
                     continue
+
+
+
 
                 elif token == "STRING" or token == "NUMINT":
                     tokens_encontrados.append((TOKENS[token], lexema))
@@ -78,8 +80,5 @@ def analisar_lexico(caminho_entrada, caminho_saida):
         for codigo_token, valor in tokens_encontrados:
             f.write(f"{codigo_token} {valor}\n")
 
-    # Escrever tabela de símbolos
-    with open("obj/tabela_simbolos.json", "w", encoding="utf-8") as f:
-        json.dump(TABELA_SIMBOLOS, f, indent=4, ensure_ascii=False)
 
     print("Análise léxica concluída com sucesso.")

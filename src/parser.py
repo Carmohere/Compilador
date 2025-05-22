@@ -40,6 +40,8 @@ class Parser:
                 node = self.cmd_escreva()
             elif tipo == 'SE':
                 node = self.cmd_se()
+            elif tipo == 'PARA':
+                node = self.cmd_para()
             elif tipo == 'EOF':
                 break
             else:
@@ -51,7 +53,7 @@ class Parser:
                 raiz.adicionar_filho(node)
 
         print("Análise sintática concluída com sucesso!")
-        return raiz  # retorna a raiz da árvore
+        return raiz
 
     def cmd_escreva(self):
         print("Reconhecendo comando 'escreva'")
@@ -92,6 +94,62 @@ class Parser:
 
         return ASTNode("LEIA", valor=id_token[1])
 
+    def cmd_para(self):
+        print("Reconhecendo comando 'para'")
+
+        # Consome o token 'PARA'
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PARA":
+            self.erro("Esperado 'para'", token)
+
+        # Identificador de controle
+        id_token = self.proximo_token()
+        if TOKEN_MAP.get(id_token[0]) != "ID":
+            self.erro("Esperado identificador no comando 'para'", id_token)
+
+        # Operador de atribuição <-
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "ATR":
+            self.erro("Esperado operador de atribuição '<-'", token)
+
+        # Expressão inicial
+        inicio_expr = self.expressao()
+
+        # Palavra-chave 'ate'
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "ATE":
+            self.erro("Esperado 'ate'", token)
+
+        # Expressão final
+        fim_expr = self.expressao()
+
+        # Palavra-chave 'passo'
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "PASSO":
+            self.erro("Esperado 'passo'", token)
+
+        # Expressão de incremento
+        passo_expr = self.expressao()
+
+        # Bloco de comandos do loop
+        comandos = []
+        while TOKEN_MAP.get(self.token_atual()[0]) not in ("FIMPARA", "EOF"):
+            comandos.append(self.analisar())  # ou self.cmd()
+
+        # Palavra-chave 'fimpara'
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "FIMPARA":
+            self.erro("Esperado 'fimpara'", token)
+
+        print("Comando 'para' reconhecido com sucesso.")
+        return ASTNode("PARA", filhos=[
+            ASTNode("ID", valor=id_token[1]),
+            ASTNode("INICIO", filhos=[inicio_expr]),
+            ASTNode("FIM", filhos=[fim_expr]),
+            ASTNode("PASSO", filhos=[passo_expr]),
+            ASTNode("COMANDOS", filhos=comandos)
+        ])
+
     def cmd_declaracao(self):
         print("Reconhecendo declaração de variável")
         tipo_token = self.proximo_token()  # consome TIPO
@@ -107,6 +165,30 @@ class Parser:
             ASTNode("ID", valor=id_token[1])
         ])
 
+    def expressao(self):
+        # Começa pegando o primeiro termo (NUMINT ou ID)
+        termo1 = self.proximo_token()
+        if TOKEN_MAP.get(termo1[0]) not in ("ID", "NUMINT"):
+            self.erro("Esperado identificador ou número inteiro na expressão", termo1)
+
+        node = ASTNode("OPERANDO", valor=termo1[1])
+
+        # Agora, verifica se há um operador
+        if self.token_atual()[0] in ("19", "20", "18", "21"):  # + - / *
+            op_token = self.proximo_token()
+            termo2 = self.proximo_token()
+            if TOKEN_MAP.get(termo2[0]) not in ("ID", "NUMINT"):
+                self.erro("Esperado segundo operando após operador", termo2)
+
+            return ASTNode("EXPRESSAO", filhos=[
+                ASTNode("OPERANDO", valor=termo1[1]),
+                ASTNode("OPERADOR", valor=op_token[1]),
+                ASTNode("OPERANDO", valor=termo2[1])
+            ])
+
+        # Se não tem operador, é só um valor direto
+        return node
+
     def cmd_atribuicao(self):
         print("Reconhecendo comando de atribuição")
 
@@ -118,15 +200,13 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "ATR":
             self.erro("Esperado operador de atribuição '<-'", token)
 
-        valor_token = self.proximo_token()
-        if TOKEN_MAP.get(valor_token[0]) not in ("ID", "NUMINT", "STRING"):
-            self.erro("Esperado valor numérico, identificador ou string na atribuição", valor_token)
+        expressao_node = self.expressao()  # Agora suporta expressões!
 
         print("Comando de atribuição reconhecido com sucesso.")
 
         return ASTNode("ATRIBUICAO", filhos=[
             ASTNode("ID", valor=id_token[1]),
-            ASTNode("VALOR", valor=valor_token[1])
+            expressao_node
         ])
 
     def cmd_se(self):
@@ -142,8 +222,7 @@ class Parser:
             self.erro("Esperado ID ou número na condição", esquerda)
 
         operador = self.proximo_token()
-        if TOKEN_MAP.get(operador[0]) not in ("LOGMENOR", "LOGMAIOR", "LOGIGUAL", "LOGDIFF", "LOGMENORIGUAL",
-                                              "LOGMAIORIGUAL"):
+        if TOKEN_MAP.get(operador[0]) not in ("LOGMENOR", "LOGMAIOR", "LOGIGUAL", "LOGDIFF", "LOGMENORIGUAL", "LOGMAIORIGUAL"):
             self.erro("Esperado operador lógico na condição", operador)
 
         direita = self.proximo_token()
@@ -158,14 +237,14 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "ENTAO":
             self.erro("Esperado 'entao' após condição", token)
 
-        # Nó da condição
+        # Criação da condição como nó da AST
         condicao = ASTNode("CONDICAO", filhos=[
             ASTNode("OPERANDO", valor=esquerda[1]),
             ASTNode("OPERADOR", valor=operador[1]),
             ASTNode("OPERANDO", valor=direita[1])
         ])
 
-        # Bloco 'entao'
+        # Bloco do 'entao'
         comandos_entao = []
         while True:
             token = self.token_atual()
@@ -176,19 +255,19 @@ class Parser:
                 comandos_entao.append(self.cmd_leia())
             elif tipo == "ID":
                 comandos_entao.append(self.cmd_atribuicao())
-            elif tipo == "SENAO":
-                break
-            elif tipo == "FIMSE":
+            elif tipo == "SE":
+                comandos_entao.append(self.cmd_se())  # Suporte a aninhamento
+            elif tipo == "SENAO" or tipo == "FIMSE":
                 break
             else:
                 self.erro("Comando inválido dentro de 'se'", token)
                 break
 
-        # Bloco 'senao' (opcional)
+        # Bloco do 'senao' (opcional)
         comandos_senao = []
         token = self.token_atual()
         if TOKEN_MAP.get(token[0]) == "SENAO":
-            self.proximo_token()  # consome 'senao'
+            self.proximo_token()
             while True:
                 token = self.token_atual()
                 tipo = TOKEN_MAP.get(token[0])
@@ -198,24 +277,30 @@ class Parser:
                     comandos_senao.append(self.cmd_leia())
                 elif tipo == "ID":
                     comandos_senao.append(self.cmd_atribuicao())
+                elif tipo == "SE":
+                    comandos_senao.append(self.cmd_se())  # Suporte a aninhamento
                 elif tipo == "FIMSE":
                     break
                 else:
                     self.erro("Comando inválido dentro de 'senao'", token)
                     break
 
+        # Finalização obrigatória
         token = self.token_atual()
         if TOKEN_MAP.get(token[0]) != "FIMSE":
             self.erro("Esperado 'fimse'", token)
-        self.proximo_token()
+        self.proximo_token()  # consome fimse
 
         print("Comando 'se' reconhecido com sucesso.")
-        return ASTNode("SE", filhos=[
-            condicao,
-            ASTNode("ENTAO", filhos=comandos_entao),
-            ASTNode("SENAO", filhos=comandos_senao) if comandos_senao else None
-        ])
 
+        filhos = [
+            condicao,
+            ASTNode("ENTAO", filhos=comandos_entao)
+        ]
+        if comandos_senao:
+            filhos.append(ASTNode("SENAO", filhos=comandos_senao))
+
+        return ASTNode("SE", filhos=filhos)
 
 def salvar_ast_em_arquivo(ast, caminho, nivel=0):
     with open(caminho, "w", encoding="utf-8") as f:

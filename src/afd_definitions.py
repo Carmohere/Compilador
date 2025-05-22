@@ -7,7 +7,7 @@ token_regex = {
     "SENAO": r"\bsenao\b",
     "FIMSE": r"\bfim_se\b",
     "PARA": r"\bpara\b",
-    "ATE": r"\baté\b",
+    "ATE": r"\bate\b",
     "PASSO": r"\bpasso\b",
     "FIMPARA": r"\bfim_para\b",
     "LEIA": r"\bleia\b",
