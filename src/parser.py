@@ -136,11 +136,6 @@ class Parser:
         while TOKEN_MAP.get(self.token_atual()[0]) not in ("FIMPARA", "EOF"):
             comandos.append(self.analisar())  # ou self.cmd()
 
-        # Palavra-chave 'fimpara'
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "FIMPARA":
-            self.erro("Esperado 'fimpara'", token)
-
         print("Comando 'para' reconhecido com sucesso.")
         return ASTNode("PARA", filhos=[
             ASTNode("ID", valor=id_token[1]),
@@ -155,6 +150,10 @@ class Parser:
         tipo_token = self.proximo_token()  # consome TIPO
         tipo_nome = tipo_token[1]
 
+        token = self.proximo_token()
+        if TOKEN_MAP.get(token[0]) != "DOIS_PONTOS":
+            return self.erro("Esperado ':' após tipo na declaração", token)
+
         id_token = self.proximo_token()
         if TOKEN_MAP.get(id_token[0]) != "ID":
             return self.erro("Esperado identificador (ID) na declaração", id_token)
@@ -166,27 +165,45 @@ class Parser:
         ])
 
     def expressao(self):
-        # Começa pegando o primeiro termo (NUMINT ou ID)
+        return self.expressao_logica()
+
+    def expressao_logica(self):
+        esquerda = self.expressao_relacional()
+        while TOKEN_MAP.get(self.token_atual()[0]) in ("E", "OU"):
+            op_token = self.proximo_token()
+            direita = self.expressao_relacional()
+            esquerda = ASTNode("EXP_LOGICA", valor=op_token[1], filhos=[esquerda, direita])
+        return esquerda
+
+    def expressao_relacional(self):
+        esquerda = self.expressao_aritmetica()
+        if TOKEN_MAP.get(self.token_atual()[0]) in (
+            "LOGIGUAL", "LOGDIFF", "LOGMAIOR", "LOGMENOR", "LOGMAIORIGUAL", "LOGMENORIGUAL"
+        ):
+            op_token = self.proximo_token()
+            direita = self.expressao_aritmetica()
+            return ASTNode("EXP_RELACIONAL", valor=op_token[1], filhos=[esquerda, direita])
+        return esquerda
+
+    def expressao_aritmetica(self):
         termo1 = self.proximo_token()
         if TOKEN_MAP.get(termo1[0]) not in ("ID", "NUMINT"):
             self.erro("Esperado identificador ou número inteiro na expressão", termo1)
 
         node = ASTNode("OPERANDO", valor=termo1[1])
 
-        # Agora, verifica se há um operador
         if self.token_atual()[0] in ("19", "20", "18", "21"):  # + - / *
             op_token = self.proximo_token()
             termo2 = self.proximo_token()
             if TOKEN_MAP.get(termo2[0]) not in ("ID", "NUMINT"):
                 self.erro("Esperado segundo operando após operador", termo2)
 
-            return ASTNode("EXPRESSAO", filhos=[
+            return ASTNode("EXP_ARITMETICA", filhos=[
                 ASTNode("OPERANDO", valor=termo1[1]),
                 ASTNode("OPERADOR", valor=op_token[1]),
                 ASTNode("OPERANDO", valor=termo2[1])
             ])
 
-        # Se não tem operador, é só um valor direto
         return node
 
     def cmd_atribuicao(self):
@@ -213,36 +230,11 @@ class Parser:
         print("Reconhecendo comando 'se'")
         self.proximo_token()  # consome 'SE'
 
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PARAB":
-            self.erro("Esperado '(' após 'se'", token)
-
-        esquerda = self.proximo_token()
-        if TOKEN_MAP.get(esquerda[0]) not in ("ID", "NUMINT"):
-            self.erro("Esperado ID ou número na condição", esquerda)
-
-        operador = self.proximo_token()
-        if TOKEN_MAP.get(operador[0]) not in ("LOGMENOR", "LOGMAIOR", "LOGIGUAL", "LOGDIFF", "LOGMENORIGUAL", "LOGMAIORIGUAL"):
-            self.erro("Esperado operador lógico na condição", operador)
-
-        direita = self.proximo_token()
-        if TOKEN_MAP.get(direita[0]) not in ("ID", "NUMINT"):
-            self.erro("Esperado ID ou número após operador lógico", direita)
-
-        token = self.proximo_token()
-        if TOKEN_MAP.get(token[0]) != "PARFE":
-            self.erro("Esperado ')' após condição", token)
+        condicao = self.expressao()
 
         token = self.proximo_token()
         if TOKEN_MAP.get(token[0]) != "ENTAO":
             self.erro("Esperado 'entao' após condição", token)
-
-        # Criação da condição como nó da AST
-        condicao = ASTNode("CONDICAO", filhos=[
-            ASTNode("OPERANDO", valor=esquerda[1]),
-            ASTNode("OPERADOR", valor=operador[1]),
-            ASTNode("OPERANDO", valor=direita[1])
-        ])
 
         # Bloco do 'entao'
         comandos_entao = []

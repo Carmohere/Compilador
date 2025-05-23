@@ -1,0 +1,16 @@
+PROGRAMA
+  DECLARACAO
+    TIPO: inteiro
+    ID: i
+  PARA
+    ID: i
+    INICIO
+      OPERANDO: 1
+    FIM
+      OPERANDO: 3
+    PASSO
+      OPERANDO: 1
+    COMANDOS
+      PROGRAMA
+        ESCREVA
+          VALOR: i

@@ -1,9 +1,7 @@
 import re
-import json
 from pathlib import Path
 from afd_definitions import token_regex
 from tokens import TOKENS
-
 
 TABELA_SIMBOLOS = {}
 SIMBOLO_POS = 0
@@ -52,9 +50,6 @@ def analisar_lexico(caminho_entrada, caminho_saida):
                     pos += len(lexema)
                     continue
 
-
-
-
                 elif token == "STRING" or token == "NUMINT":
                     tokens_encontrados.append((TOKENS[token], lexema))
                     pos += len(lexema)
@@ -79,6 +74,5 @@ def analisar_lexico(caminho_entrada, caminho_saida):
     with open(caminho_saida, "w", encoding="utf-8") as f:
         for codigo_token, valor in tokens_encontrados:
             f.write(f"{codigo_token} {valor}\n")
-
 
     print("Análise léxica concluída com sucesso.")

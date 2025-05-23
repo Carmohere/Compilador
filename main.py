@@ -5,7 +5,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 from src.lexer import analisar_lexico
 from src.semantico import AnalisadorSemantico
 
-
 if __name__ == "__main__":
     analisar_lexico("entrada/exemplo.POR", "obj/saida_lexica.obj")
 

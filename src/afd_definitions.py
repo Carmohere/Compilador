@@ -1,6 +1,8 @@
 import re
 
 token_regex = {
+    "DOIS_PONTOS": r":",
+    "PONTO_VIRGULA": r";",
     "TIPO": r"\binteiro\b",
     "SE": r"\bse\b",
     "ENTAO": r"\bentao\b",
