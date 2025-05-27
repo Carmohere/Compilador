@@ -66,11 +66,9 @@ def analisar_lexico(caminho_entrada, caminho_saida):
             pos += 1
             continue
 
-    # Token final de arquivo
     tokens_encontrados.append((TOKENS["EOF"], "EOF"))
 
     # Escrever arquivo de saída (.OBJ)
-    # Em analisar_lexico(), ao escrever o arquivo:
     with open(caminho_saida, "w", encoding="utf-8") as f:
         for codigo_token, valor in tokens_encontrados:
             f.write(f"{codigo_token} {valor}\n")

@@ -1,16 +1,9 @@
 PROGRAMA
   DECLARACAO
     TIPO: inteiro
-    ID: i
-  PARA
-    ID: i
-    INICIO
-      OPERANDO: 1
-    FIM
-      OPERANDO: 3
-    PASSO
-      OPERANDO: 1
-    COMANDOS
-      PROGRAMA
-        ESCREVA
-          VALOR: i
+    ID: x
+  ATRIBUICAO
+    ID: x
+    OPERANDO: 10
+  ESCREVA
+    VALOR: x

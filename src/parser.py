@@ -14,7 +14,7 @@ class Parser:
             token = self.tokens[self.posicao]
             self.posicao += 1
             return token
-        return (str(TOKENS["EOF"]), "EOF")  # Retorna o token EOF
+        return (str(TOKENS["EOF"]), "EOF")
 
     def token_atual(self):
         if self.posicao < len(self.tokens):
@@ -192,7 +192,7 @@ class Parser:
 
         node = ASTNode("OPERANDO", valor=termo1[1])
 
-        if self.token_atual()[0] in ("19", "20", "18", "21"):  # + - / *
+        if self.token_atual()[0] in ("19", "20", "18", "21"):
             op_token = self.proximo_token()
             termo2 = self.proximo_token()
             if TOKEN_MAP.get(termo2[0]) not in ("ID", "NUMINT"):
@@ -217,7 +217,7 @@ class Parser:
         if TOKEN_MAP.get(token[0]) != "ATR":
             self.erro("Esperado operador de atribuição '<-'", token)
 
-        expressao_node = self.expressao()  # Agora suporta expressões!
+        expressao_node = self.expressao()
 
         print("Comando de atribuição reconhecido com sucesso.")
 
@@ -255,7 +255,7 @@ class Parser:
                 self.erro("Comando inválido dentro de 'se'", token)
                 break
 
-        # Bloco do 'senao' (opcional)
+        # Bloco do 'senao'
         comandos_senao = []
         token = self.token_atual()
         if TOKEN_MAP.get(token[0]) == "SENAO":
@@ -270,7 +270,7 @@ class Parser:
                 elif tipo == "ID":
                     comandos_senao.append(self.cmd_atribuicao())
                 elif tipo == "SE":
-                    comandos_senao.append(self.cmd_se())  # Suporte a aninhamento
+                    comandos_senao.append(self.cmd_se())
                 elif tipo == "FIMSE":
                     break
                 else:
